@@ -1,23 +1,178 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import LoginIn from "./components/loginIn Form/login";
+import SignUp from "./components/SignUp Form/signUp.js";
+import { Routes, Route } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Home } from "./components/Home/home";
+import { Product } from "./components/Product/product";
+import { Order } from "./components/Order/order";
+import axios from "axios";
+
+
 
 function App() {
+
+  
+  const [prod, setProd] = useState([]);
+  const [prodId, setProdId] = useState("");
+  const [product, setProduct] = useState("");
+  const [quantity, setQuantity] = useState(0);
+ 
+  const [prodPath, setProdPath] = useState("");
+  let orderPath = `/order/${prodId}`;
+
+  /* api call to save address */
+  function saveAddress(address) {
+
+    console.log(address);
+    fetch('http://localhost:3001/api/v1/addresses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': `${localStorage.getItem('x-auth-token')}`
+      },
+      body: JSON.stringify(address),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }
+
+    /* saving quantity */
+  function sendQuantity(quan) {
+    setQuantity(quan);
+  }
+
+      /* setting product id  */
+  function setId(id) {
+    setProdId(id);
+    setProdPath(`/product-details/${id}`)
+    let item = prod.filter((i) => i._id === id);
+
+    setProduct(item);
+  }
+
+      /* api call for login  */
+  async function postData(userEmail, userPassword, setOpen,setMsg) {
+    let obj = {
+      email: userEmail,
+      password: userPassword,
+    };
+
+
+    // fetch('http://localhost:3001/api/v1/auth', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(obj),
+    // })
+    //   .then(response => {
+    //     console.log(response.headers["x-auth-token"]);
+    //     localStorage.setItem("x-auth-token", "1");
+    //     return response.json()
+    //   })
+    //   .then(data => {
+
+    //     setUserData(data);
+    //     navigate("/home");
+    //   })
+    //   .catch(error => {
+    //     alert(error);
+    //   });
+    try {
+      const res = await axios.post('http://localhost:3001/api/v1/auth', obj);
+     
+      localStorage.setItem("x-auth-token", res.headers["x-auth-token"]);
+      setTimeout(() => {
+        navigate('/products');
+      }, 2000)
+      setTimeout(() => {
+        setMsg("Login successfully")
+        setOpen(true);
+      }, 500)
+
+    }
+    catch (e) {
+      setMsg(e.response.data);
+      setOpen(true);
+    }
+
+
+  }
+
+  const navigate = useNavigate();
+
+  /* api call for signUp  */
+  async function createUser(user,setOpen,setMsg) {
+     try {
+       await axios.post('http://localhost:3001/api/v1/users', user)
+    
+       setTimeout(() => {
+        navigate('/login');
+      }, 2000)
+      setTimeout(() => {
+        setMsg("Sign up Successfully")
+        setOpen(true);
+      
+      }, 500)
+    
+
+  }catch(e){
+  
+    setMsg(e.response.data);
+    setOpen(true);
+  }
+
+      // .then(response => response.json())
+      // .then(data => {
+      //   console.log(data);
+      //   navigate("/login");
+      // })
+      // .catch(error => {
+      //   alert(error);
+      // });
+  };
+
+  useEffect(() => {
+    showProd();
+  }, [])
+
+    /* api call for getting product  */
+  async function showProd() {
+
+    fetch('http://localhost:3001/api/v1/products', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        setProd(data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+    /* routing for all the pages  */
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Routes>
+        <Route exact path="/" element={<SignUp createUser={createUser} />} />
+        <Route exact path="/login" element={<LoginIn postData={postData} />} />
+        <Route exact path="/products" element={<Home  prod={prod} setId={setId} showProd={showProd}/>} />
+        <Route path={prodPath} element={<Product product={product}  sendQuantity={sendQuantity} />} />
+        <Route path={orderPath} element={<Order product={product}  quantity={quantity} saveAddress={saveAddress} />} />
+      </Routes>
+
     </div>
   );
 }
