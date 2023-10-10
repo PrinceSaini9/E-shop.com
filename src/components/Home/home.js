@@ -28,23 +28,21 @@ import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
 
 
-
-
-
 export function Home(props) {
+
   const [prodList, setProdList] = useState([]);
   const [alignment, setAlignment] = useState('all');
   const [option, setOption] = useState(1);
-  const [open,setOpen]= useState(false);
-  const [prod,setProd]=useState("");
+  const [open, setOpen] = useState(false);
+  const [prod, setProd] = useState("");
   const handleClose = () => setOpen(false);
   const defaultList = props.prod;
   const navigate = useNavigate();
-  const [page,setPage]=useState(0);
-  const [del,setDel]= useState(false);
-  const [mod,setMod]= useState(false);
-  const [add,setAdd]= useState(false);
-  const [newProduct,setProduct]= useState({
+  const [page, setPage] = useState(0);
+  const [del, setDel] = useState(false);
+  const [mod, setMod] = useState(false);
+  const [add, setAdd] = useState(false);
+  const [newProduct, setProduct] = useState({
     name: "",
     category: "",
     description: "",
@@ -52,7 +50,8 @@ export function Home(props) {
     imageURL: "",
     availableItems: "",
     price: ""
-});
+  });
+
   const style = {
     position: 'absolute',
     top: '50%',
@@ -64,30 +63,31 @@ export function Home(props) {
     boxShadow: 24,
     p: 4,
   };
-  let data={};
-if(localStorage.getItem('x-auth-token')){
-     data =jwtDecode(localStorage.getItem('x-auth-token'));
-    }
-    
-    async function deleteItem(){
-      setOpen(false);
-      
-       await fetch(`http://localhost:3001/api/v1/products/${prod._id}`, {
+
+  let data = {};
+  if (localStorage.getItem('x-auth-token')) {
+    data = jwtDecode(localStorage.getItem('x-auth-token'));
+  }
+
+  /*delete product */
+  async function deleteItem() {
+
+    setOpen(false);
+
+    await fetch(`http://localhost:3001/api/v1/products/${prod._id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         'x-auth-token': `${localStorage.getItem('x-auth-token')}`
       }
     })
-      
-      
       .catch(error => {
         alert(error);
       });
-      setDel(true);
-      props.showProd();
 
-    }
+    setDel(true);
+    props.showProd();
+  }
 
   function goToLogin() {
     navigate("/login");
@@ -95,9 +95,9 @@ if(localStorage.getItem('x-auth-token')){
 
   useEffect(() => {
     setProdList(props.prod);
-
   }, [props.prod]);
 
+  /*handeling category*/
   const handleChange = (e) => {
     let newAlignment = e.target.value;
     setAlignment(newAlignment);
@@ -110,10 +110,11 @@ if(localStorage.getItem('x-auth-token')){
       setProdList(defaultList);
   };
 
-  async function handleSubmit(){
-    
-    const data = {...newProduct};
-   await fetch(`http://localhost:3001/api/v1/products`, {
+  /*adding new product for admin */
+  async function handleSubmit() {
+
+    const data = { ...newProduct };
+    await fetch(`http://localhost:3001/api/v1/products`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -124,36 +125,40 @@ if(localStorage.getItem('x-auth-token')){
       .catch(error => {
         alert(error);
       });
-      setProduct({
-        name: "",
-        category: "",
-        description: "",
-        manufacturer: "",
-        imageURL: "",
-        availableItems: "",
-        price: ""
+    setProduct({
+      name: "",
+      category: "",
+      description: "",
+      manufacturer: "",
+      imageURL: "",
+      availableItems: "",
+      price: ""
     })
 
-      props.showProd();
-      setPage(0);
-      setAdd(true);
-      
-      
+    props.showProd();
+    setPage(0);
+    setAdd(true);
 
   }
-  function inputHandler(e){
-    const state = {...newProduct}
+
+  /*change handler of add product form */
+  function inputHandler(e) {
+    const state = { ...newProduct }
     state[e.target.id] = e.target.value;
     setProduct(state);
   }
-  function modifyHandler(e){
-    const state = {...prod}
+
+  /* change handler modify form */
+  function modifyHandler(e) {
+    const state = { ...prod }
     state[e.target.id] = e.target.value;
     setProd(state);
   }
-   async function handleModify(){
-    
-   await  fetch(`http://localhost:3001/api/v1/products/${prod._id}`, {
+
+  /*handeling modify form */
+  async function handleModify() {
+
+    await fetch(`http://localhost:3001/api/v1/products/${prod._id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -164,11 +169,12 @@ if(localStorage.getItem('x-auth-token')){
       .catch(error => {
         alert(error);
       });
-      props.showProd();
-      setPage(0);
-      setMod(true);
+    props.showProd();
+    setPage(0);
+    setMod(true);
   }
 
+  /*sorting functions */
   function sortOrder(prop) {
     return function (a, b) {
       if (a[prop] > b[prop])
@@ -190,6 +196,7 @@ if(localStorage.getItem('x-auth-token')){
     }
   }
 
+  /*handling sort options */
   const handleOptions = (event) => {
     let newValue = event.target.value
     setOption(newValue);
@@ -203,10 +210,14 @@ if(localStorage.getItem('x-auth-token')){
       prodList.sort(sortOrder("createdAt"));
 
   };
+
+  /*navigating to product-details */
   function selectProduct(id) {
     props.setId(id);
     navigate(`/product-details/${id}`)
   }
+
+  /*handling serach functionalities */
   function handleSearch(value) {
     if (value !== "") {
       let product = defaultList.filter((item) => item.name.toLowerCase().includes(value.toLowerCase()));
@@ -217,12 +228,13 @@ if(localStorage.getItem('x-auth-token')){
     }
   }
 
-  if (data.isAdmin===false) {
+  /*product page for user */
+  if (data.isAdmin === false) {
 
     return (
       <>
         <Head email={data.name} handleSearch={handleSearch} />
-        
+
         <Grid container mt={2} justifyContent="center"  >
           <ToggleButtonGroup
             color="primary"
@@ -311,46 +323,47 @@ if(localStorage.getItem('x-auth-token')){
 
     );
   }
-  else if( data.isAdmin && page===0){
- return(
-  <>
-  <AdminHead  handleSearch={handleSearch} setPage={setPage}/>
-  <Stack position="fixed" sx={{ width: '30%', right: 10 }} >
-                        <Collapse in={del}>
-                            <Alert variant="filled" style={{ fontSize: 12 }} onClose={() => { setDel(false); }}>Product - {prod.name} deleted Successfully</Alert>
-                        </Collapse>
-                    </Stack>
-                    <Stack position="fixed" sx={{ width: '30%', right: 10 }} >
-                        <Collapse in={mod}>
-                            <Alert variant="filled" style={{ fontSize: 12 }} onClose={() => { setMod(false); }}>Product - {prod.name} modified Successfully</Alert>
-                        </Collapse>
-                    </Stack>
-                    <Stack position="fixed" sx={{ width: '30%', right: 10 }} >
-                        <Collapse in={add}>
-                            <Alert variant="filled" style={{ fontSize: 12 }} onClose={() => { setAdd(false); }}>New Product added Successfully</Alert>
-                        </Collapse>
-                    </Stack>
-  <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Confirm Deletion of Product!
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Are you sure you want to delete the product?
-          </Typography>
-          <Grid container justifyContent="flex-end"  sx={{ mt: 2 }}>
-            <Button color="success" variant="contained" onClick={deleteItem}>Yes</Button>
-            &nbsp;
-            <Button color="error" variant="contained" onClick={handleClose}>No</Button>
-          </Grid>
-        </Box>
-      </Modal>
-  <Grid container mt={2} justifyContent="center"  >
+  /*product page for admin */
+  else if (data.isAdmin && page === 0) {
+    return (
+      <>
+        <AdminHead handleSearch={handleSearch} setPage={setPage} />
+        <Stack position="fixed" sx={{ width: '30%', right: 10 }} >
+          <Collapse in={del}>
+            <Alert variant="filled" style={{ fontSize: 12 }} onClose={() => { setDel(false); }}>Product - {prod.name} deleted Successfully</Alert>
+          </Collapse>
+        </Stack>
+        <Stack position="fixed" sx={{ width: '30%', right: 10 }} >
+          <Collapse in={mod}>
+            <Alert variant="filled" style={{ fontSize: 12 }} onClose={() => { setMod(false); }}>Product - {prod.name} modified Successfully</Alert>
+          </Collapse>
+        </Stack>
+        <Stack position="fixed" sx={{ width: '30%', right: 10 }} >
+          <Collapse in={add}>
+            <Alert variant="filled" style={{ fontSize: 12 }} onClose={() => { setAdd(false); }}>New Product added Successfully</Alert>
+          </Collapse>
+        </Stack>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Confirm Deletion of Product!
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              Are you sure you want to delete the product?
+            </Typography>
+            <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
+              <Button color="success" variant="contained" onClick={deleteItem}>Yes</Button>
+              &nbsp;
+              <Button color="error" variant="contained" onClick={handleClose}>No</Button>
+            </Grid>
+          </Box>
+        </Modal>
+        <Grid container mt={2} justifyContent="center"  >
           <ToggleButtonGroup
             color="primary"
             value={alignment}
@@ -425,14 +438,14 @@ if(localStorage.getItem('x-auth-token')){
                       <Grid item xs={12} >
                         <Grid container xs={12} mx={1} justifyContent="space-between">
                           <Grid item xs={5}>
-                          <Button size="small" style={{ color: "white", backgroundColor: "#3f51b5" }} onClick={() => selectProduct(items._id)}>Buy</Button>
+                            <Button size="small" style={{ color: "white", backgroundColor: "#3f51b5" }} onClick={() => selectProduct(items._id)}>Buy</Button>
                           </Grid>
-                          <Grid item  mr={2}>
-                            <EditIcon onClick={()=>{setProd(items);setPage(2)}} />
+                          <Grid item mr={2}>
+                            <EditIcon onClick={() => { setProd(items); setPage(2) }} />
                             &nbsp;&nbsp;&nbsp;
-                            <DeleteIcon onClick={()=>{setProd(items);setOpen(true)}}/>
+                            <DeleteIcon onClick={() => { setProd(items); setOpen(true) }} />
                           </Grid>
-                          </Grid>
+                        </Grid>
                       </Grid>
                     </Grid>
                   </Card>
@@ -441,257 +454,260 @@ if(localStorage.getItem('x-auth-token')){
             })
           }
         </Grid>
-  </>
-  
- )
+      </>
+
+    )
   }
-  else if(data.isAdmin && page===1){
- return(
-  <>
-  <AdminHead  handleSearch={handleSearch} setPage={setPage}/>
-  <Grid container sm={12}>
-  <Grid item sm={12}>
-                    <Container component="main" maxWidth="xs">
-                        <Box
-                            sx={{
-                                marginTop: 4,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <Typography mb={2} component="h1" variant="h6">
-                                ADD PRODUCT
-                            </Typography>
-                            <ValidatorForm onSubmit={handleSubmit}>
-                                <Grid container spacing={2} xs={12} >
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="name"
-                                            label="Enter Name"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={newProduct.name}
-                                            validators={["required"]}
-                                            onChange={inputHandler}
-                                            errorMessages={["Name cannot be empty"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="category"
-                                            label="Category"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={newProduct.category}
-                                            validators={["required"]}
-                                            onChange={inputHandler}
-                                            errorMessages={["Category is required"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="description"
-                                            label="Product Description"
-                                            type="text"
-                                            fullWidth
-                                            value={newProduct.description}
-                                            onChange={inputHandler}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="price"
-                                            label="Price"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={newProduct.price}
-                                            validators={["required","isNumber"]}
-                                            onChange={inputHandler}
-                                            errorMessages={["price is mandatory","can be number only"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="availableItems"
-                                            label="Available Items"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={newProduct.availableItems}
-                                            validators={["required"]}
-                                            onChange={inputHandler}
-                                            errorMessages={["availableItems feild is mandatory"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="imageURL"
-                                            label="image URL"
-                                            type="text"
-                                            fullWidth
-                                            value={newProduct.imageURL}
-                                            onChange={inputHandler}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="manufacturer"
-                                            label="Manufacturer"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={newProduct.manufacturer}
-                                            validators={["required"]}
-                                            onChange={inputHandler}
-                                            errorMessages={["manufacturer is mandatory"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                </Grid>
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    sx={{ mt: 3, mb: 2 }}
-                                    style={{backgroundColor:"#3f51b5"}}
-                                >
-                                    ADD PRODUCT
-                                </Button>
-                            </ValidatorForm>
-                        </Box>
-                    </Container>
-                </Grid>
-  </Grid>
-  </>
- )
-  }
-  else if(data.isAdmin && page===2){
-    return(
+  /*add product form */
+  else if (data.isAdmin && page === 1) {
+    return (
       <>
-      <AdminHead  handleSearch={handleSearch} setPage={setPage}/>
-      <Grid container sm={12}>
-  <Grid item sm={12}>
-                    <Container component="main" maxWidth="xs">
-                        <Box
-                            sx={{
-                                marginTop: 4,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <Typography mb={2} component="h1" variant="h6">
-                                MODIFY PRODUCT
-                            </Typography>
-                            <ValidatorForm onSubmit={handleModify} >
-                                <Grid container spacing={2} xs={12} >
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="name"
-                                            label="Enter Name"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={prod.name}
-                                            validators={["required"]}
-                                            onChange={modifyHandler}
-                                            errorMessages={["Name cannot be empty"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="category"
-                                            label="Category"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={prod.category}
-                                            validators={["required"]}
-                                            onChange={modifyHandler}
-                                            errorMessages={["Category is required"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="description"
-                                            label="Product Description"
-                                            type="text"
-                                            fullWidth
-                                            value={prod.description}
-                                            onChange={modifyHandler}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="price"
-                                            label="Price"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={prod.price}
-                                            validators={["required","isNumber"]}
-                                            onChange={modifyHandler}
-                                            errorMessages={["price is mandatory","can be number only"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="availableItems"
-                                            label="Available Items"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={prod.availableItems}
-                                            validators={["required"]}
-                                            onChange={modifyHandler}
-                                            errorMessages={["availableItems feild is mandatory"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="imageURL"
-                                            label="image URL"
-                                            type="text"
-                                            fullWidth
-                                            value={prod.imageURL}
-                                            onChange={modifyHandler}
-                                        ></TextValidator>
-                                    </Grid>
-                                    <Grid item xs={12} >
-                                        <TextValidator
-                                            id="manufacturer"
-                                            label="Manufacturer"
-                                            type="text"
-                                            fullWidth
-                                            required
-                                            value={prod.manufacturer}
-                                            validators={["required"]}
-                                            onChange={modifyHandler}
-                                            errorMessages={["manufacturer is mandatory"]}
-                                        ></TextValidator>
-                                    </Grid>
-                                </Grid>
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    sx={{ mt: 3, mb: 2 }}
-                                    style={{backgroundColor:"#3f51b5"}}
-                                >
-                                    MODIFY PRODUCT
-                                </Button>
-                            </ValidatorForm>
-                        </Box>
-                    </Container>
-                </Grid>
-  </Grid>
+        <AdminHead handleSearch={handleSearch} setPage={setPage} />
+        <Grid container sm={12}>
+          <Grid item sm={12}>
+            <Container component="main" maxWidth="xs">
+              <Box
+                sx={{
+                  marginTop: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <Typography mb={2} component="h1" variant="h6">
+                  ADD PRODUCT
+                </Typography>
+                <ValidatorForm onSubmit={handleSubmit}>
+                  <Grid container spacing={2} xs={12} >
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="name"
+                        label="Enter Name"
+                        type="text"
+                        fullWidth
+                        required
+                        value={newProduct.name}
+                        validators={["required"]}
+                        onChange={inputHandler}
+                        errorMessages={["Name cannot be empty"]}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="category"
+                        label="Category"
+                        type="text"
+                        fullWidth
+                        required
+                        value={newProduct.category}
+                        validators={["required"]}
+                        onChange={inputHandler}
+                        errorMessages={["Category is required"]}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="description"
+                        label="Product Description"
+                        type="text"
+                        fullWidth
+                        value={newProduct.description}
+                        onChange={inputHandler}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="price"
+                        label="Price"
+                        type="text"
+                        fullWidth
+                        required
+                        value={newProduct.price}
+                        validators={["required", "isNumber"]}
+                        onChange={inputHandler}
+                        errorMessages={["price is mandatory", "can be number only"]}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="availableItems"
+                        label="Available Items"
+                        type="text"
+                        fullWidth
+                        required
+                        value={newProduct.availableItems}
+                        validators={["required"]}
+                        onChange={inputHandler}
+                        errorMessages={["availableItems feild is mandatory"]}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="imageURL"
+                        label="image URL"
+                        type="text"
+                        fullWidth
+                        value={newProduct.imageURL}
+                        onChange={inputHandler}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="manufacturer"
+                        label="Manufacturer"
+                        type="text"
+                        fullWidth
+                        required
+                        value={newProduct.manufacturer}
+                        validators={["required"]}
+                        onChange={inputHandler}
+                        errorMessages={["manufacturer is mandatory"]}
+                      ></TextValidator>
+                    </Grid>
+                  </Grid>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                    style={{ backgroundColor: "#3f51b5" }}
+                  >
+                    ADD PRODUCT
+                  </Button>
+                </ValidatorForm>
+              </Box>
+            </Container>
+          </Grid>
+        </Grid>
+      </>
+    )
+  }
+  /* modify product form*/
+  else if (data.isAdmin && page === 2) {
+    return (
+      <>
+        <AdminHead handleSearch={handleSearch} setPage={setPage} />
+        <Grid container sm={12}>
+          <Grid item sm={12}>
+            <Container component="main" maxWidth="xs">
+              <Box
+                sx={{
+                  marginTop: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <Typography mb={2} component="h1" variant="h6">
+                  MODIFY PRODUCT
+                </Typography>
+                <ValidatorForm onSubmit={handleModify} >
+                  <Grid container spacing={2} xs={12} >
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="name"
+                        label="Enter Name"
+                        type="text"
+                        fullWidth
+                        required
+                        value={prod.name}
+                        validators={["required"]}
+                        onChange={modifyHandler}
+                        errorMessages={["Name cannot be empty"]}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="category"
+                        label="Category"
+                        type="text"
+                        fullWidth
+                        required
+                        value={prod.category}
+                        validators={["required"]}
+                        onChange={modifyHandler}
+                        errorMessages={["Category is required"]}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="description"
+                        label="Product Description"
+                        type="text"
+                        fullWidth
+                        value={prod.description}
+                        onChange={modifyHandler}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="price"
+                        label="Price"
+                        type="text"
+                        fullWidth
+                        required
+                        value={prod.price}
+                        validators={["required", "isNumber"]}
+                        onChange={modifyHandler}
+                        errorMessages={["price is mandatory", "can be number only"]}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="availableItems"
+                        label="Available Items"
+                        type="text"
+                        fullWidth
+                        required
+                        value={prod.availableItems}
+                        validators={["required"]}
+                        onChange={modifyHandler}
+                        errorMessages={["availableItems feild is mandatory"]}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="imageURL"
+                        label="image URL"
+                        type="text"
+                        fullWidth
+                        value={prod.imageURL}
+                        onChange={modifyHandler}
+                      ></TextValidator>
+                    </Grid>
+                    <Grid item xs={12} >
+                      <TextValidator
+                        id="manufacturer"
+                        label="Manufacturer"
+                        type="text"
+                        fullWidth
+                        required
+                        value={prod.manufacturer}
+                        validators={["required"]}
+                        onChange={modifyHandler}
+                        errorMessages={["manufacturer is mandatory"]}
+                      ></TextValidator>
+                    </Grid>
+                  </Grid>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                    style={{ backgroundColor: "#3f51b5" }}
+                  >
+                    MODIFY PRODUCT
+                  </Button>
+                </ValidatorForm>
+              </Box>
+            </Container>
+          </Grid>
+        </Grid>
 
       </>
     )
   }
+  /*if not authorized */
   else {
     return (
       <>

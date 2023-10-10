@@ -10,19 +10,26 @@ export function Product(props) {
     let product = props.product[0];
     const [quantity, setQuantity] = useState(1);
 
+    /*storing value of quantity */
     function quantityHandler(e) {
         let newQuantity = e.target.value;
         setQuantity(newQuantity);
     };
+
+    /*navigating to order-page */
     function submitHandler() {
         props.sendQuantity(quantity);
         navigate(`/order/${product._id}`)
     }
+
     const navigate = useNavigate();
+
+    /*navigating to login page */
     function goToLogin() {
         navigate("/login");
     }
 
+    /* product-details page */
     if (localStorage.getItem('x-auth-token')) {
         return (
             <>
@@ -78,6 +85,7 @@ export function Product(props) {
             </>
         );
     }
+    /*if user is not authorized */
     else {
         return (
             <>

@@ -19,6 +19,7 @@ import { useEffect } from "react";
 
 
 export function Order(props) {
+
     let product = props.product[0];
     const navigate = useNavigate();
     const [option, setOption] = useState(-1);
@@ -27,14 +28,13 @@ export function Order(props) {
     const [stepNum, setStepNum] = useState(0);
     const [addressList, setAddressList] = useState([]);
 
-
-
     const steps = [
         'Item',
         'Set address',
         'Confirm order',
     ];
 
+    /* get api call for address*/
     function getAddress() {
         fetch('http://localhost:3001/api/v1/addresses', {
             method: 'GET',
@@ -51,12 +51,10 @@ export function Order(props) {
                 alert(error);
             });
     }
+
     useEffect(() => {
         getAddress();
     }, [open])
-
-
-
 
 
     function handleOptions(newValue) {
@@ -65,12 +63,11 @@ export function Order(props) {
         console.log(addressList[0]);
         setStepNum(2);
 
-
     }
+
     function handleSubmit(state) {
 
         props.saveAddress(state);
-
         setOpen(true);
     }
 
@@ -79,6 +76,7 @@ export function Order(props) {
     }
 
     if (localStorage.getItem('x-auth-token')) {
+        /* item page*/
         if (stepNum === 0) {
             return (
                 <>
@@ -88,6 +86,7 @@ export function Order(props) {
                 </>
             );
         }
+        /*set address page */
         else if (stepNum === 1) {
             return (
                 <>
@@ -101,6 +100,7 @@ export function Order(props) {
                 </>
             );
         }
+        /* confirm order page*/
         else if (stepNum === 2 || stepNum === 3) {
             return (
                 <>
@@ -172,7 +172,7 @@ export function Order(props) {
                         <Button
                             type="submit"
                             onClick={() => { setStepNum(3); setConf(true) }}
-                            style={{backgroundColor:"#3f51b5"}}
+                            style={{ backgroundColor: "#3f51b5" }}
                             variant="contained"
                             sx={{ mt: 6, mb: 2 }}
                             sm={6}
@@ -184,6 +184,7 @@ export function Order(props) {
             );
         }
     }
+    
     else {
         return (
             <>

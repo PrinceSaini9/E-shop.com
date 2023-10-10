@@ -14,6 +14,7 @@ import Grid from '@mui/material/Grid';
 
 export default function Head() {
 
+  /*seach-box styling */
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
@@ -55,7 +56,8 @@ export default function Head() {
           },
         },
       }));
-      
+    
+      /* header of product-detail */
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">

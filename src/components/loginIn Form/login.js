@@ -24,7 +24,7 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
+      <Link color="inherit" href="https://github.com/PrinceSaini9/E-shop.com">
         E-Shop.com
       </Link>{' '}
       {new Date().getFullYear()}
@@ -33,14 +33,14 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 export default function LoginIn(props) {
+
   const [open, setOpen] = React.useState(false);
   const [msg, setMsg] = React.useState("");
   let col = (msg==="Login successfully")?"success":"error"
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);

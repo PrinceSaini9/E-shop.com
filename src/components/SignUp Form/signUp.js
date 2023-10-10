@@ -20,7 +20,7 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
+      <Link color="inherit" href="https://github.com/PrinceSaini9/E-shop.com">
         E-Shop.com
       </Link>{' '}
       {new Date().getFullYear()}
@@ -36,38 +36,38 @@ const defaultTheme = createTheme();
 export default function SignUp(props) {
   const [open, setOpen] = React.useState(false);
   const [msg, setMsg] = React.useState("");
-  const [pass,setPass]=React.useState("");
-  const [cpass,setCpass]=React.useState("");
+  const [pass, setPass] = React.useState("");
+  const [cpass, setCpass] = React.useState("");
 
-  let col=(msg==="Sign up Successfully")? "success":"error";
-function inputHandler(e){
-if(e.target.id==="password")
-setPass(e.target.value);
-else
-setCpass(e.target.value)
-}
-   
+  let col = (msg === "Sign up Successfully") ? "success" : "error";
+  function inputHandler(e) {
+    if (e.target.id === "password")
+      setPass(e.target.value);
+    else
+      setCpass(e.target.value)
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const user ={
+    const user = {
       email: data.get('email'),
       password: data.get('password'),
-      firstName:data.get('firstName'),
-      lastName:data.get('lastName'),
-      contactNumber:data.get('phoneNumber')
+      firstName: data.get('firstName'),
+      lastName: data.get('lastName'),
+      contactNumber: data.get('phoneNumber')
     };
-    props.createUser(user,setOpen,setMsg);
+    props.createUser(user, setOpen, setMsg);
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
-        <Header />
-        <Stack position="fixed" sx={{ width: '30%', right: 10 }} >
-                        <Collapse in={open}>
-                            <Alert severity={col} variant="filled" style={{ fontSize: 12 }} onClose={() => { setOpen(false); }}>{msg}</Alert>
-                        </Collapse>
-                    </Stack>
+      <Header />
+      <Stack position="fixed" sx={{ width: '30%', right: 10 }} >
+        <Collapse in={open}>
+          <Alert severity={col} variant="filled" style={{ fontSize: 12 }} onClose={() => { setOpen(false); }}>{msg}</Alert>
+        </Collapse>
+      </Stack>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -138,13 +138,13 @@ setCpass(e.target.value)
                   type="password"
                   id="cpassword"
                   onChange={inputHandler}
-                  error={pass!==cpass&&cpass!==""}
-                  helperText={(pass===cpass||cpass==="")?"":"Passwords don't match"}
+                  error={pass !== cpass && cpass !== ""}
+                  helperText={(pass === cpass || cpass === "") ? "" : "Passwords don't match"}
                   autoComplete="new-password"
                 />
               </Grid>
               <Grid item xs={12}>
-              <TextField
+                <TextField
                   required
                   fullWidth
                   id="phoneNumber"
@@ -159,7 +159,7 @@ setCpass(e.target.value)
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              style={{backgroundColor:"#3f51b5"}}
+              style={{ backgroundColor: "#3f51b5" }}
             >
               Sign Up
             </Button>
